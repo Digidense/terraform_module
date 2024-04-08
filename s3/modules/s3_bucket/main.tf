@@ -1,27 +1,44 @@
+resource "aws_kms_key" "my_kms_key" {
+  description             = "KMS key for S3 encryption"
+  deletion_window_in_days = 30
+}
+
 resource "aws_s3_bucket" "my_bucket" {
   bucket = "digidensebucket2024"
   acl    = "private"
 
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        kms_master_key_id = aws_kms_key.my_kms_key.arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+
+  lifecycle_rule {
+    id      = "log-files"
+    enabled = true
+
+    prefix = "logs/"
+
+    expiration {
+      days = 90
+    }
+  }
 }
 
-resource "aws_s3_bucket_object" "my_object" {
-  count = var.create ? 1 : 0
+resource "aws_iam_policy" "s3_bucket_policy" {
+  name        = "s3_bucket_policy"
+  description = "IAM policy for S3 bucket"
 
-  bucket        = aws_s3_bucket.my_bucket.id
-  key           = var.key
-  force_destroy = var.force_destroy
-
-
-  storage_class = try(upper(var.storage_class), var.storage_class)
-
-  server_side_encryption = var.server_side_encryption
-  kms_key_id             = var.kms_key_id
-  bucket_key_enabled     = var.bucket_key_enabled
-
-  source_hash = var.source_hash
-
-  lifecycle {
-    ignore_changes = [object_lock_retain_until_date]
-  }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Action    = "s3:GetObject"
+      Resource  = "${aws_s3_bucket.my_bucket.arn}/*"
+    }]
+  })
 }
 
