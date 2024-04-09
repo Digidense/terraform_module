@@ -37,7 +37,7 @@ variable "tags" {
 variable "iam_role_assume" {
   description = "The name of the IAM role"
   type        = string
-  default = "IAM_assume_role"
+  default     = "IAM_assume_role"
 }
 
 

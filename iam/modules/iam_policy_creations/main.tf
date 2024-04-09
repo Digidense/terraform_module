@@ -1,9 +1,11 @@
+# referred to the policy
 locals {
   aws_managed_policies = {
     "AdministratorAccess" = data.aws_iam_policy_document.administrator_access.json
   }
 }
 
+#create the administrator policy
 data "aws_iam_policy_document" "administrator_access" {
   statement {
     effect    = "Allow"
@@ -12,6 +14,7 @@ data "aws_iam_policy_document" "administrator_access" {
   }
 }
 
+#Create the policy name and description
 resource "aws_iam_policy" "policy" {
   count       = var.create_policy ? 1 : 0
   name        = var.name
@@ -21,7 +24,7 @@ resource "aws_iam_policy" "policy" {
   tags        = var.tags
 }
 
-
+# Create the role
 resource "aws_iam_role" "iam_role" {
   name = var.iam_role_assume
   assume_role_policy = jsonencode({
@@ -38,7 +41,7 @@ resource "aws_iam_role" "iam_role" {
   })
 }
 
-
+#Assume the role
 resource "aws_iam_role_policy_attachment" "policy_attachment" {
   count      = var.create_policy ? 1 : 0
   role       = aws_iam_role.iam_role.name
