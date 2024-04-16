@@ -1,4 +1,3 @@
-#create a iam policy
 resource "aws_iam_policy" "iam_policy" {
   name        = var.name[0]
   description = "IAM policy for KMS, SNS, and S3 permissions"
@@ -6,12 +5,31 @@ resource "aws_iam_policy" "iam_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
+      # Statement for KMS
       {
         Effect = "Allow",
         Action = [
-          "kms:*",
-          "sns:*",
-          "s3:*",
+          "kms:Encrypt",
+          "kms:Decrypt",
+        ],
+        Resource = "*",
+      },
+      # Statement for SNS
+      {
+        Effect = "Allow",
+        Action = [
+          "sns:Subscribe",
+          "sns:Receive",
+          "sns:DeleteMessage",
+        ],
+        Resource = "*",
+      },
+      # Statement for S3
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
         ],
         Resource = "*",
       },
@@ -22,8 +40,8 @@ resource "aws_iam_policy" "iam_policy" {
 #Attach the role
 resource "aws_iam_policy_attachment" "role_attachment" {
   name       = var.name[1]
-  roles      = [aws_iam_role.iam_role.name]
-  policy_arn = "arn:aws:iam::105787501323:policy/iam_policy"
+  roles      = aws_iam_role.iam_role.name
+  policy_arn = aws_iam_policy.iam_policy.arn
 }
 
 #create a iam role
@@ -35,7 +53,7 @@ resource "aws_iam_role" "iam_role" {
       {
         Effect = "Allow",
         Principal = {
-          Service = "lambda.amazonaws.com",
+          Service = "ec2.amazonaws.com",
         },
         Action = "sts:AssumeRole",
       },
