@@ -215,11 +215,11 @@ resource "aws_security_group" "virtual_sg" {
   tags = var.sg
 }
 
-# Create Interface VPC endpoint
+# Create Interface VPC private endpoint
 resource "aws_vpc_endpoint" "s3_endpoint" {
   service_name      = "com.amazonaws.us-east-1.s3"
   vpc_id            = aws_vpc.virtual_network.id
   vpc_endpoint_type = "Gateway"
+  route_table_ids   = [aws_route_table.virtual_pri_rt.id]
   tags              = var.endpoint
 }
-
