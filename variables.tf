@@ -1,15 +1,3 @@
-variable "region" {
-  type        = string
-  description = "this block is for region"
-  default     = "us-east-1"
-}
-
-variable "max_retries" {
-  type        = number
-  description = "this block is for max_retries"
-  default     = 10
-}
-
 variable "role_name" {
   type        = string
   description = "Name of the IAM role for the EKS cluster"
