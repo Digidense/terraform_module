@@ -1,4 +1,4 @@
-# creating locals for policy reference
+# Creating locals for policy reference
 locals {
   ecr_readonly_policy_arn    = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   eks_cni_policy_arn         = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
