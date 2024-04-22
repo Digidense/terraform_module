@@ -1,8 +1,3 @@
-provider "aws" {
-  region      = var.region
-  max_retries = var.max_retries
-}
-
 # creating locals for policy reference
 locals {
   ecr_readonly_policy_arn    = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
