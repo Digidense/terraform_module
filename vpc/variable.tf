@@ -136,18 +136,6 @@ variable "nat_gateway" {
   })
 }
 
-variable "NACLs" {
-  description = "Create the Network ACLs"
-  type = object({
-    Name        = string
-    Environment = string
-  })
-  default = ({
-    Name        = "virtual_NACLs"
-    Environment = "Dev"
-  })
-}
-
 variable "sg" {
   description = "Create the security groups"
   type = object({
@@ -167,7 +155,7 @@ variable "endpoint" {
     Environment = string
   })
   default = ({
-    Name        = "virtual_endpoint"
+    Name        = "virtual_private_endpoint"
     Environment = "Dev"
   })
 }
