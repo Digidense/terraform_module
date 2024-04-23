@@ -1,9 +1,8 @@
-// Module Block: KMS Module
+# This module sets up a KMS module attachment for ECR encryption
 module "Kms_module" {
-  source                  = "git::https://github.com/Digidense/terraform_module.git//kms?ref=feature/DD-35/kms_module"
+  source                  = "git::https://github.com/Digidense/terraform_module.git//kms?ref=v1.0.0"
   aliases_name            = var.aliases_name
-  description             = "KMS module attachment for ECR encryption"
-  deletion_window_in_days = var.deleation_day
+  deletion_window_in_days = var.deletion_day
   enable_key_rotation     = var.enable_key_rotation
 }
 

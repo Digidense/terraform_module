@@ -4,8 +4,8 @@ variable "aliases_name" {
   default     = "alias/Kms_ecr_key"
 }
 
-variable "deleation_day" {
-  type        = string
+variable "deletion_day" {
+  type        = number
   description = "this block is for deletion_window_in_days declaration"
   default     = 7
 }
@@ -31,7 +31,7 @@ variable "ecr-push-policy" {
 variable "ecr-name" {
   type        = string
   description = "this block is for  ecr-name declaration"
-  default     = "ecr-module"
+  default     = "digi-ecr"
 }
 
 variable "mutable" {
@@ -45,3 +45,4 @@ variable "encryption_type" {
   description = "this block is for  encryption_type declaration"
   default     = "KMS"
 }
+
