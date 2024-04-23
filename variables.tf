@@ -1,3 +1,15 @@
+variable "region" {
+  type        = string
+  description = "this block is for region"
+  default     = "us-east-1"
+}
+
+variable "max_retries" {
+  type        = number
+  description = "this block is for max_retries"
+  default     = 10
+}
+
 variable "role_name" {
   type        = string
   description = "Name of the IAM role for the EKS cluster"
@@ -46,4 +58,20 @@ variable "node_group_name" {
   default     = "unique_cluster_Node_Group"
 }
 
+variable "desired_size" {
+  type        = number
+  description = "desired_size EKS cluster node creation"
+  default     = 2
+}
 
+variable "max_size" {
+  type        = number
+  description = "max_size EKS cluster node creation"
+  default     = 2
+}
+
+variable "mix_size" {
+  type        = number
+  description = "mix_size EKS cluster node creation"
+  default     = 1
+}
