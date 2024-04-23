@@ -1,4 +1,9 @@
-# Creating locals for policy reference
+provider "aws" {
+  region      = var.region
+  max_retries = var.max_retries
+}
+
+# creating locals for policy reference
 locals {
   ecr_readonly_policy_arn    = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   eks_cni_policy_arn         = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
@@ -70,12 +75,12 @@ resource "aws_eks_addon" "kube_proxy" {
   addon_version = var.addons_versions[2]
 }
 
-# Creating the eks_pod_identity_agent addons for eks cluster
-resource "aws_eks_addon" "eks_pod_identity_agent" {
-  cluster_name  = aws_eks_cluster.my_cluster.name
-  addon_name    = var.addons_name[2]
-  addon_version = var.addons_versions[3]
-}
+## Creating the eks_pod_identity_agent addons for eks cluster
+#resource "aws_eks_addon" "eks_pod_identity_agent" {
+#  cluster_name  = aws_eks_cluster.my_cluster.name
+#  addon_name    = var.addons_name[2]
+#  addon_version = var.addons_versions[3]
+#}
 
 # Creating the coredns addons for eks cluster
 resource "aws_eks_addon" "coredns" {
@@ -91,11 +96,15 @@ resource "aws_eks_node_group" "my_node_group" {
   node_role_arn   = aws_iam_role.eks_role.arn
   subnet_ids      = var.subnet_ids
   scaling_config {
-    desired_size = 2
-    max_size     = 2
-    min_size     = 1
+    desired_size = var.desired_size
+    max_size     = var.max_size
+    min_size     = var.mix_size
   }
+  depends_on = [
+    aws_eks_cluster.my_cluster,
+  ]
 }
+
 # Creating role attachment for node group
 resource "aws_iam_role_policy_attachment" "eks_additional_policies" {
   count      = length(local.additional_policies)
