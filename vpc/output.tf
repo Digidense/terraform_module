@@ -18,3 +18,7 @@ output "subnet_pri02" {
   description = "The id of subnet "
   value       = aws_subnet.virtual_subnet_pri02.id
 }
+output "virtual_sg" {
+  description = "sg ig"
+  value = aws_security_group.virtual_sg.id
+}
