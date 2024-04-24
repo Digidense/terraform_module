@@ -1,8 +1,3 @@
-provider "aws" {
-  region      = var.region
-  max_retries = var.max_retries
-}
-
 # creating locals for policy reference
 locals {
   ecr_readonly_policy_arn    = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
@@ -50,43 +45,44 @@ resource "aws_iam_policy_attachment" "eks_cluster_policy_attachment" {
   policy_arn = local.amazoneksclusterpolicy_arn
 }
 
+# Vpc module reffering to create eks cluster
+module "vpc_module" {
+  source = "git::https://github.com/Digidense/terraform_module.git//vpc?ref=feature/DD-42-VPC_module"
+}
+
 # Creating the eks cluster
 resource "aws_eks_cluster" "my_cluster" {
   name     = var.eks_cluster_name
   role_arn = aws_iam_role.eks_role.arn # Corrected the reference to match the role resource
-  version  = var.addons_versions[0]
+  version  = var.cluster_version
 
   vpc_config {
-    subnet_ids = var.subnet_ids # Using the subnet_ids variable
+    subnet_ids = [
+      module.vpc_module.subnet_pri01,
+      module.vpc_module.subnet_pri02
+    ]
   }
 }
 
-# Creating the cni addons for eks cluster
+# Creating the cni addon for the EKS cluster
 resource "aws_eks_addon" "cni" {
   cluster_name  = aws_eks_cluster.my_cluster.name
-  addon_name    = var.addons_name[0]
-  addon_version = var.addons_versions[1]
+  addon_name    = var.addons_versions[0].name
+  addon_version = var.addons_versions[0].version
 }
 
-# Creating the kube_proxy addons for eks cluster
+# Creating the kube-proxy addon for the EKS cluster
 resource "aws_eks_addon" "kube_proxy" {
   cluster_name  = aws_eks_cluster.my_cluster.name
-  addon_name    = var.addons_name[1]
-  addon_version = var.addons_versions[2]
+  addon_name    = var.addons_versions[1].name
+  addon_version = var.addons_versions[1].version
 }
 
-## Creating the eks_pod_identity_agent addons for eks cluster
-#resource "aws_eks_addon" "eks_pod_identity_agent" {
-#  cluster_name  = aws_eks_cluster.my_cluster.name
-#  addon_name    = var.addons_name[2]
-#  addon_version = var.addons_versions[3]
-#}
-
-# Creating the coredns addons for eks cluster
+# Creating the coredns addon for the EKS cluster
 resource "aws_eks_addon" "coredns" {
   cluster_name  = aws_eks_cluster.my_cluster.name
-  addon_name    = var.addons_name[3]
-  addon_version = var.addons_versions[4]
+  addon_name    = var.addons_versions[2].name
+  addon_version = var.addons_versions[2].version
 }
 
 # Creating the node group
@@ -94,7 +90,10 @@ resource "aws_eks_node_group" "my_node_group" {
   cluster_name    = aws_eks_cluster.my_cluster.name
   node_group_name = var.node_group_name
   node_role_arn   = aws_iam_role.eks_role.arn
-  subnet_ids      = var.subnet_ids
+  subnet_ids = [
+    module.vpc_module.subnet_pri01,
+    module.vpc_module.subnet_pri02
+  ]
   scaling_config {
     desired_size = var.desired_size
     max_size     = var.max_size
@@ -119,5 +118,6 @@ locals {
     local.eks_worker_node_policy_arn,
   ]
 }
+
 
 

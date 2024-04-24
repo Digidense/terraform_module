@@ -1,61 +1,60 @@
-variable "region" {
-  type        = string
-  description = "this block is for region"
-  default     = "us-east-1"
-}
-
-variable "max_retries" {
-  type        = number
-  description = "this block is for max_retries"
-  default     = 10
-}
-
 variable "role_name" {
   type        = string
   description = "Name of the IAM role for the EKS cluster"
-  default     = "eks-cluster-role"
+  default     = "eks-cluster-policy-role1"
 }
 
 variable "node_attachment_name" {
   type        = string
   description = "Name of the IAM policy attachment for the EKS node group"
-  default     = "eks-cluster-node-attachment"
+  default     = "eks-cluster-node-attachments1"
 }
 
 variable "eks_cluster_attachment_name" {
   type        = string
   description = "Name of the IAM policy attachment for the EKS cluster"
-  default     = "eks-cluster-policy-attachment"
+  default     = "eks-cluster-policy-attachments1"
 }
 
 variable "eks_cluster_name" {
   type        = string
   description = "Name of the EKS cluster"
-  default     = "unique_cluster"
+  default     = "unique_Cluster1"
 }
 
-variable "subnet_ids" {
-  type        = list(string)
-  description = "List of subnet IDs in different availability zones (AZs)"
-  default     = ["subnet-09aab3e001a66bb73", "subnet-0f0b451c7faef2e34"]
-}
-
-variable "addons_name" {
-  type        = list(string)
-  description = "List of names of addons to be installed on the EKS cluster"
-  default     = ["vpc-cni", "kube-proxy", "eks-pod-identity-agent", "coredns"]
-}
 
 variable "addons_versions" {
-  type        = list(string)
+  type = list(object({
+    name    = string
+    version = string
+  }))
   description = "List of versions of addons to be installed on the EKS cluster"
-  default     = ["1.29", "v1.16.0-eksbuild.1", "v1.29.0-eksbuild.1", "v1.2.0-eksbuild.1", "v1.11.1-eksbuild.4"] #first index is eks_cluster version
+  default = [
+    {
+      name    = "vpc-cni"
+      version = "v1.16.0-eksbuild.1"
+    },
+    {
+      name    = "kube-proxy"
+      version = "v1.29.0-eksbuild.1"
+    },
+    {
+      name    = "coredns"
+      version = "v1.11.1-eksbuild.4"
+    }
+  ]
 }
 
 variable "node_group_name" {
   type        = string
   description = "Name of the EKS cluster"
-  default     = "unique_cluster_Node_Group"
+  default     = "unique_Cluster_Node_Group1"
+}
+
+variable "cluster_version" {
+  type = string
+  description = "Eks cluster version"
+  default = "1.29"
 }
 
 variable "desired_size" {
