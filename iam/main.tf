@@ -1,5 +1,5 @@
 resource "aws_iam_policy" "iam_policy" {
-  name        = var.name[0]
+  name        = "sns_policy"
   description = "IAM policy for KMS, SNS, and S3 permissions"
 
   policy = jsonencode({
@@ -39,14 +39,14 @@ resource "aws_iam_policy" "iam_policy" {
 
 #Attach the role
 resource "aws_iam_policy_attachment" "role_attachment" {
-  name       = var.name[1]
-  roles      = aws_iam_role.iam_role.name
+  name       = "sns_role_attachment"
+  roles      = [aws_iam_role.iam_role.name]
   policy_arn = aws_iam_policy.iam_policy.arn
 }
 
 #create a iam role
 resource "aws_iam_role" "iam_role" {
-  name = var.name[2]
+  name = "sns_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
