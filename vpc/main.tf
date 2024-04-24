@@ -90,22 +90,17 @@ resource "aws_nat_gateway" "nat_gateway" {
 }
 #Create security groups
 resource "aws_security_group" "virtual_sg" {
-  name        = "virtual_sg1"
-  description = "Traffic to internet http"
-  vpc_id      = aws_vpc.virtual_network.id
-  ingress {
-    description = "Allow SSH traffic"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description = "Allow HTTPS traffic"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
+  name        = "virtual_sg"
+  description = "Security group for virtual network"
+  dynamic "ingress" {
+    for_each = var.ingress_rules
+    content {
+      description      = ingress.value["description"]
+      from_port        = ingress.value["from_port"]
+      to_port          = ingress.value["to_port"]
+      protocol         = ingress.value["protocol"]
+      cidr_blocks      = ingress.value["cidr_blocks"]
+    }
   }
   egress {
     from_port   = 0
