@@ -7,13 +7,13 @@ variable "role_name" {
 variable "node_attachment_name" {
   type        = string
   description = "Name of the IAM policy attachment for the EKS node group"
-  default     = "eks-node-attachments"
+  default     = "eks-node-attachments1"
 }
 
 variable "eks_cluster_attachment_name" {
   type        = string
   description = "Name of the IAM policy attachment for the EKS cluster"
-  default     = "eks-policy-attachments"
+  default     = "eks-policy-attachments1"
 }
 
 variable "eks_cluster_name" {

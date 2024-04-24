@@ -61,6 +61,7 @@ resource "aws_eks_cluster" "my_cluster" {
       module.vpc_module.subnet_pri01,
       module.vpc_module.subnet_pri02
     ]
+    security_group_ids = [module.vpc_module.security_group_id]
   }
 }
 

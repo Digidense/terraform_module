@@ -10,3 +10,6 @@ output "subnet_pri02_id" {
   value = module.vpc_module.subnet_pri02
 }
 
+output "security_group_id" {
+  value = module.vpc_module.security_group_id
+}
