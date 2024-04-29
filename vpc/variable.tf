@@ -178,6 +178,31 @@ variable "ingress_rules" {
       to_port          = 3306
       protocol         = "TCP"
       cidr_blocks      = ["0.0.0.0/0"]
+    },
+    {
+      description      = "Allow PostgreSQL traffic"
+      from_port        = 5432
+      to_port          = 5432
+      protocol         = "TCP"
+      cidr_blocks      = ["0.0.0.0/0"]
+    }
+  ]
+}
+
+variable "egress_rules" {
+  description = "List of egress rules for the security group"
+  type = list(object({
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
     }
   ]
 }
