@@ -92,6 +92,7 @@ resource "aws_nat_gateway" "nat_gateway" {
 resource "aws_security_group" "virtual_sg" {
   name        = "virtual_sg"
   description = "Security group for virtual network"
+  vpc_id = aws_vpc.virtual_network.id
   dynamic "ingress" {
     for_each = var.ingress_rules
     content {
