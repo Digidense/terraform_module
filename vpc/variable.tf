@@ -178,7 +178,7 @@ variable "ingress_rules" {
       to_port          = 3306
       protocol         = "TCP"
       cidr_blocks      = ["0.0.0.0/0"]
-    }
+    }
   ]
 }
 
