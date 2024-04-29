@@ -171,7 +171,14 @@ variable "ingress_rules" {
       to_port          = 443
       protocol         = "TCP"
       cidr_blocks      = ["0.0.0.0/0"]
-    }
+    },
+    {
+      description      = "Allow MySQL traffic"
+      from_port        = 3306
+      to_port          = 3306
+      protocol         = "TCP"
+      cidr_blocks      = ["0.0.0.0/0"]
+    }
   ]
 }
 
