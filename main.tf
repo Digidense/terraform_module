@@ -1,16 +1,17 @@
-resource "aws_iam_user" "org-admin-users" {
-  name = "user1"
+# Define Route 53 zone and record
+module "API_module" {
+  source = "git::https://github.com/Digidense/terraform_module.git//?ref=v4.0.0"
 }
-resource "aws_iam_user_policy_attachment" "example_user_policy_attachment" {
-  user       = aws_iam_user.org-admin-users.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+
+resource "aws_route53_zone" "my_hosted_zone" {
+  name = var.domain_name
 }
-resource "aws_iam_user_login_profile" "org-admin-users-login-profile" {
-  user                    = aws_iam_user.org-admin-users.name
-  password_length         = 10
-  password_reset_required = false
-}
-output "Password" {
-  value = aws_iam_user_login_profile.org-admin-users-login-profile.password
+
+resource "aws_route53_record" "records" {
+  zone_id = aws_route53_zone.my_hosted_zone.zone_id
+  name    = "example.${var.domain_name}"
+  type    = "A"
+  ttl     = 300
+  records = ["192.0.2.1"]
 }
 
