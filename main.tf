@@ -16,11 +16,14 @@ resource "aws_api_gateway_resource" "test_resource" {
 
 # Define Lambda function
 resource "aws_lambda_function" "api_lambda" {
-  filename      = "example_lambda.zip"
-  function_name = "REST_API"
+  filename      = var.lambda_zip_file
+  function_name = var.lambda_function_name
   role          = aws_iam_role.lambda_role.arn
-  handler       = "example.handler"
-  runtime       = "nodejs20.x"
+  handler       = var.lambda_handler
+  runtime       = var.lambda_runtime
+  tracing_config {
+    mode = "Active"
+  }
 }
 
 # Define Lambda IAM Role
@@ -114,13 +117,14 @@ resource "aws_api_gateway_deployment" "api_deploy" {
   stage_name  = "Development"
 }
 
-
-# Cloudwatch
-resource "aws_cloudwatch_log_group" "api_gateway_logs" {
-  name = "api-gateway/demo-api-access-logs"
+# Define API Gateway Stage
+resource "aws_api_gateway_stage" "example_stage" {
+  stage_name    = "DEV"
+  rest_api_id   = aws_api_gateway_rest_api.rest_api.id
+  deployment_id = aws_api_gateway_deployment.api_deploy.id
 }
 
-# Define Lambda Cloud_Watch Role
+# API Gateway log_role
 resource "aws_iam_role" "api_gateway_log_role" {
   name = "api_gateway_log_role"
   assume_role_policy = jsonencode({
@@ -135,12 +139,23 @@ resource "aws_iam_role" "api_gateway_log_role" {
   })
 }
 
+# role attachment
 resource "aws_iam_role_policy_attachment" "api_gateway_log_role_attachment" {
   role       = aws_iam_role.api_gateway_log_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
 
-
+#Enable the cloudwatch logs
+resource "aws_api_gateway_method_settings" "YOUR_settings" {
+  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  stage_name  = aws_api_gateway_stage.example_stage.stage_name
+  method_path = "*/*"
+  settings {
+    logging_level      = "INFO"
+    data_trace_enabled = true
+    metrics_enabled    = true
+  }
+}
 
 
 
