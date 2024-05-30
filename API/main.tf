@@ -1,5 +1,5 @@
 # Define API Gateway REST API
-resource "aws_api_gateway_rest_api" "Daemon_api" {
+resource "aws_api_gateway_rest_api" "virtual_api" {
   name        = "virtual_api"
   description = "API Gateway for development"
   endpoint_configuration {
@@ -9,8 +9,8 @@ resource "aws_api_gateway_rest_api" "Daemon_api" {
 
 # Define API Gateway resource
 resource "aws_api_gateway_resource" "virtual_resource" {
-  rest_api_id = aws_api_gateway_rest_api.Daemon_api.id
-  parent_id   = aws_api_gateway_rest_api.Daemon_api.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.virtual_api.id
+  parent_id   = aws_api_gateway_rest_api.virtual_api.root_resource_id
   path_part   = "virtual_resource"
 }
 
@@ -49,7 +49,7 @@ EOF
 # Define Lambda API Authorizer
 resource "aws_api_gateway_authorizer" "lambda_authorizer" {
   name                   = "authorizer"
-  rest_api_id            = aws_api_gateway_rest_api.Daemon_api.id
+  rest_api_id            = aws_api_gateway_rest_api.virtual_api.id
   type                   = "REQUEST"
   authorizer_uri         = aws_lambda_function.api_lambda.invoke_arn
   authorizer_credentials = aws_iam_role.lambda_role.arn
@@ -57,7 +57,7 @@ resource "aws_api_gateway_authorizer" "lambda_authorizer" {
 
 # API Gateway GET methods
 resource "aws_api_gateway_method" "get_method" {
-  rest_api_id   = aws_api_gateway_rest_api.Daemon_api.id
+  rest_api_id   = aws_api_gateway_rest_api.virtual_api.id
   resource_id   = aws_api_gateway_resource.virtual_resource.id
   http_method   = "GET"
   authorization = "NONE"
@@ -65,7 +65,7 @@ resource "aws_api_gateway_method" "get_method" {
 
 # API Gateway PUT methods
 resource "aws_api_gateway_method" "put_method" {
-  rest_api_id   = aws_api_gateway_rest_api.Daemon_api.id
+  rest_api_id   = aws_api_gateway_rest_api.virtual_api.id
   resource_id   = aws_api_gateway_resource.virtual_resource.id
   http_method   = "PUT"
   authorization = "CUSTOM"
@@ -74,7 +74,7 @@ resource "aws_api_gateway_method" "put_method" {
 
 # API Gateway POST methods
 resource "aws_api_gateway_method" "post_method" {
-  rest_api_id   = aws_api_gateway_rest_api.Daemon_api.id
+  rest_api_id   = aws_api_gateway_rest_api.virtual_api.id
   resource_id   = aws_api_gateway_resource.virtual_resource.id
   http_method   = "POST"
   authorization = "AWS_IAM"
@@ -82,7 +82,7 @@ resource "aws_api_gateway_method" "post_method" {
 
 # Integrate Lambda with API Gateway
 resource "aws_api_gateway_integration" "lambda_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.Daemon_api.id
+  rest_api_id             = aws_api_gateway_rest_api.virtual_api.id
   resource_id             = aws_api_gateway_resource.virtual_resource.id
   http_method             = aws_api_gateway_method.get_method.http_method
   integration_http_method = "POST"
@@ -92,7 +92,7 @@ resource "aws_api_gateway_integration" "lambda_integration" {
 
 # Integrate Lambda with API Gateway
 resource "aws_api_gateway_integration" "put_lambda_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.Daemon_api.id
+  rest_api_id             = aws_api_gateway_rest_api.virtual_api.id
   resource_id             = aws_api_gateway_resource.virtual_resource.id
   http_method             = aws_api_gateway_method.put_method.http_method
   integration_http_method = "PUT"
@@ -102,7 +102,7 @@ resource "aws_api_gateway_integration" "put_lambda_integration" {
 
 # Integrate Lambda with API Gateway
 resource "aws_api_gateway_integration" "get_lambda_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.Daemon_api.id
+  rest_api_id             = aws_api_gateway_rest_api.virtual_api.id
   resource_id             = aws_api_gateway_resource.virtual_resource.id
   http_method             = aws_api_gateway_method.post_method.http_method
   integration_http_method = "GET"
@@ -117,10 +117,16 @@ resource "aws_api_gateway_deployment" "api_deploy" {
     aws_api_gateway_integration.put_lambda_integration,
     aws_api_gateway_integration.get_lambda_integration
   ]
-  rest_api_id = aws_api_gateway_rest_api.Daemon_api.id
+  rest_api_id = aws_api_gateway_rest_api.virtual_api.id
   stage_name  = "Development"
 }
 
+# Define API Gateway Stage
+resource "aws_api_gateway_stage" "api_stage" {
+  stage_name    = "DEV"
+  rest_api_id   = aws_api_gateway_rest_api.virtual_api.id
+  deployment_id = aws_api_gateway_deployment.api_deploy.id
+}
 
 # API Gateway log_role
 resource "aws_iam_role" "api_gateway_log_role" {
@@ -137,47 +143,24 @@ resource "aws_iam_role" "api_gateway_log_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "api_gateway_log_role_attachment_cloudwatch" {
+# role attachment
+resource "aws_iam_role_policy_attachment" "api_gateway_log_role_attachment" {
   role       = aws_iam_role.api_gateway_log_role.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "api_gateway_log_role_attachment_cloudwatchlogs" {
-  role       = aws_iam_role.api_gateway_log_role.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
 
 resource "aws_cloudwatch_log_group" "api_gateway_log_group" {
-  name = "/aws/api_gateway/${aws_api_gateway_rest_api.Daemon_api.id}"
+  name = "/aws/api_gateway/${aws_api_gateway_rest_api.virtual_api.id}"
 }
-
 
 #Enable the cloudwatch logs
 resource "aws_api_gateway_method_settings" "api_settings" {
-  rest_api_id   = aws_api_gateway_rest_api.Daemon_api.id
-  stage_name    = aws_api_gateway_stage.api_stage.stage_name
-  method_path   = "*/*"
+  rest_api_id   = aws_api_gateway_rest_api.virtual_api.id
+  stage_name  = aws_api_gateway_stage.api_stage.stage_name
+  method_path = "*/*"
   settings {
-    logging_level        = "INFO"
-    data_trace_enabled   = true
-    metrics_enabled      = true
+    logging_level = "INFO"
+    data_trace_enabled = true
+    metrics_enabled = true
   }
 }
-resource "aws_api_gateway_stage" "api_stage" {
-  stage_name    = "DEV"
-  rest_api_id   = aws_api_gateway_rest_api.Daemon_api.id
-  deployment_id = aws_api_gateway_deployment.api_deploy.id
-
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.api_gateway_log_group.arn
-    format          = "$context.identity.sourceIp - $context.identity.userAgent - $context.requestId"
-  }
-
-  variables = {
-    "log_level" : "INFO"
-    "tracing"   : "true"
-  }
-}
-
-
-
