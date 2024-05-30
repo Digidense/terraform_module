@@ -1,6 +1,6 @@
 # Define API Gateway REST API
 resource "aws_api_gateway_rest_api" "virtual_api" {
-  name        = "virtual_api"
+  name        = "digi_virtual_api"
   description = "API Gateway for development"
   endpoint_configuration {
     types = ["REGIONAL"]
