@@ -154,9 +154,6 @@ resource "aws_iam_role_policy_attachment" "api_CloudWatchFullAccess_attachment" 
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
 }
 
-resource "aws_cloudwatch_log_group" "api_gateway_log_group" {
-  name = "/aws/api_gateway/${aws_api_gateway_rest_api.virtual_api.id}"
-}
 
 # Set CloudWatch Logs role ARN for API Gateway account
 resource "aws_api_gateway_account" "api_account" {
@@ -165,7 +162,6 @@ resource "aws_api_gateway_account" "api_account" {
 
 # Enable the CloudWatch logs
 resource "aws_api_gateway_method_settings" "api_settings" {
-  depends_on = [aws_api_gateway_account.api_account]
   rest_api_id = aws_api_gateway_rest_api.virtual_api.id
   stage_name  = aws_api_gateway_stage.api_stage.stage_name
   method_path = "*/*"
