@@ -80,8 +80,8 @@ resource "aws_api_gateway_method" "post_method" {
   authorization = "AWS_IAM"
 }
 
-# Integrate Lambda with API Gateway
-resource "aws_api_gateway_integration" "lambda_integration" {
+# Integrate Lambda with API Gateway (GET)
+resource "aws_api_gateway_integration" "get_lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.virtual_api.id
   resource_id             = aws_api_gateway_resource.virtual_resource.id
   http_method             = aws_api_gateway_method.get_method.http_method
@@ -90,22 +90,22 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   uri                     = aws_lambda_function.api_lambda.invoke_arn
 }
 
-# Integrate Lambda with API Gateway
+# Integrate Lambda with API Gateway (PUT)
 resource "aws_api_gateway_integration" "put_lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.virtual_api.id
   resource_id             = aws_api_gateway_resource.virtual_resource.id
   http_method             = aws_api_gateway_method.put_method.http_method
-  integration_http_method = "PUT"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.api_lambda.invoke_arn
 }
 
-# Integrate Lambda with API Gateway
-resource "aws_api_gateway_integration" "get_lambda_integration" {
+# Integrate Lambda with API Gateway (POST)
+resource "aws_api_gateway_integration" "post_lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.virtual_api.id
   resource_id             = aws_api_gateway_resource.virtual_resource.id
   http_method             = aws_api_gateway_method.post_method.http_method
-  integration_http_method = "GET"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.api_lambda.invoke_arn
 }
@@ -113,9 +113,9 @@ resource "aws_api_gateway_integration" "get_lambda_integration" {
 # Deploy API Gateway
 resource "aws_api_gateway_deployment" "api_deploy" {
   depends_on = [
-    aws_api_gateway_integration.lambda_integration,
+    aws_api_gateway_integration.get_lambda_integration,
     aws_api_gateway_integration.put_lambda_integration,
-    aws_api_gateway_integration.get_lambda_integration
+    aws_api_gateway_integration.post_lambda_integration
   ]
   rest_api_id = aws_api_gateway_rest_api.virtual_api.id
   stage_name  = "Development"
@@ -143,7 +143,7 @@ resource "aws_iam_role" "api_gateway_log_role" {
   })
 }
 
-# role attachment
+# Attach necessary policies to API Gateway log_role
 resource "aws_iam_role_policy_attachment" "api_gateway_log_role_attachment" {
   role       = aws_iam_role.api_gateway_log_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
@@ -158,8 +158,14 @@ resource "aws_cloudwatch_log_group" "api_gateway_log_group" {
   name = "/aws/api_gateway/${aws_api_gateway_rest_api.virtual_api.id}"
 }
 
-#Enable the cloudwatch logs
+# Set CloudWatch Logs role ARN for API Gateway account
+resource "aws_api_gateway_account" "api_account" {
+  cloudwatch_role_arn = aws_iam_role.api_gateway_log_role.arn
+}
+
+# Enable the CloudWatch logs
 resource "aws_api_gateway_method_settings" "api_settings" {
+  depends_on = [aws_api_gateway_account.api_account]
   rest_api_id = aws_api_gateway_rest_api.virtual_api.id
   stage_name  = aws_api_gateway_stage.api_stage.stage_name
   method_path = "*/*"
