@@ -142,7 +142,7 @@ resource "aws_iam_role" "api_gateway_log_role" {
 # role attachment
 resource "aws_iam_role_policy_attachment" "api_gateway_log_role_attachment" {
   role       = aws_iam_role.api_gateway_log_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
 }
 
 #Enable the cloudwatch logs
