@@ -1,25 +1,25 @@
 variable "role_name" {
   type        = string
   description = "Name of the IAM role for the EKS cluster"
-  default     = "eks-policy-roleA"
+  default     = "eks-policy-role1sWs"
 }
 
 variable "node_attachment_name" {
   type        = string
   description = "Name of the IAM policy attachment for the EKS node group"
-  default     = "eks-node-attachments1A"
+  default     = "eks-node-attachmentsW1"
 }
 
 variable "eks_cluster_attachment_name" {
   type        = string
   description = "Name of the IAM policy attachment for the EKS cluster"
-  default     = "eks-policy-attachments1A"
+  default     = "eks-policy-attachmentsW1"
 }
 
 variable "eks_cluster_name" {
   type        = string
   description = "Name of the EKS cluster"
-  default     = "Flash_Cluster_EKS"
+  default     = "COOL_Cluster_EKS"
 }
 
 
@@ -32,15 +32,15 @@ variable "addons_versions" {
   default = [
     {
       name    = "vpc-cni"
-      version = "v1.16.0-eksbuild.1"
+      version = "v1.18.1-eksbuild.3"
     },
     {
       name    = "kube-proxy"
-      version = "v1.29.0-eksbuild.1"
+      version = "v1.29.3-eksbuild.2"
     },
     {
       name    = "coredns"
-      version = "v1.11.1-eksbuild.4"
+      version = "v1.11.1-eksbuild.9"
     }
   ]
 }
@@ -48,7 +48,7 @@ variable "addons_versions" {
 variable "node_group_name" {
   type        = string
   description = "Name of the EKS cluster"
-  default     = "Node_GroupA"
+  default     = "Node_GroupW1"
 }
 
 variable "cluster_version" {
@@ -61,6 +61,12 @@ variable "desired_size" {
   type        = number
   description = "desired_size EKS cluster node creation"
   default     = 2
+}
+
+variable "region" {
+  type        = string
+  description = "region of the EKS cluster node creation"
+  default     = "us-east-1"
 }
 
 variable "max_size" {
