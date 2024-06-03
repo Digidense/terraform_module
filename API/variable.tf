@@ -21,3 +21,9 @@ variable "lambda_runtime" {
   type        = string
   default     = "nodejs20.x"
 }
+
+variable "ingress_nlb" {
+  description = "Pass the Loadbalence uri"
+  type = string
+  default = "http://aeeb571d306ae4274a1ce2450992d547-6b82cace6496caac.elb.us-east-1.amazonaws.com"
+}
