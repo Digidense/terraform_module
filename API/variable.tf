@@ -25,5 +25,5 @@ variable "lambda_runtime" {
 variable "ingress_nlb" {
   description = "Pass the Loadbalence uri"
   type = string
-  default = "http://aeeb571d306ae4274a1ce2450992d547-6b82cace6496caac.elb.us-east-1.amazonaws.com"
+  default = "http://adfb1356f7d4d452db2f9c7da59a3a09-2e7fd284c7346cbb.elb.us-east-1.amazonaws.com"
 }
