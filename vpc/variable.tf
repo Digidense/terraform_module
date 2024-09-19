@@ -173,6 +173,20 @@ variable "ingress_rules" {
       cidr_blocks      = ["0.0.0.0/0"]
     },
     {
+      description      = "Allow HTTPS traffic"
+      from_port        = 80
+      to_port          = 80
+      protocol         = "TCP"
+      cidr_blocks      = ["0.0.0.0/0"]
+    },
+    {
+      description      = "Allow HTTPS traffic"
+      from_port        = 8080
+      to_port          = 8080
+      protocol         = "TCP"
+      cidr_blocks      = ["0.0.0.0/0"]
+    },
+    {
       description      = "Allow MySQL traffic"
       from_port        = 3306
       to_port          = 3306
