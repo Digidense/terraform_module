@@ -199,7 +199,7 @@ variable "ingress_rules" {
       to_port          = 5432
       protocol         = "TCP"
       cidr_blocks      = ["0.0.0.0/0"]
-    }
+    },
     {
       from_port   = 0
       to_port     = 0
