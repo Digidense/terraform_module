@@ -200,6 +200,12 @@ variable "ingress_rules" {
       protocol         = "TCP"
       cidr_blocks      = ["0.0.0.0/0"]
     }
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "Enywhere"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   ]
 }
 
