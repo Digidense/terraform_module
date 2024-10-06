@@ -201,6 +201,7 @@ variable "ingress_rules" {
       cidr_blocks      = ["0.0.0.0/0"]
     },
     {
+      description      = "Allow anywhere traffic"
       from_port   = 0
       to_port     = 0
       protocol    = "Enywhere"
